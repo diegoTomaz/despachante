@@ -95,7 +95,8 @@ btnGravar = ft.ElevatedButton(
 def updateOnTap():
     pass
 
-
+def teste():
+    pass
 
 linhasTabela = [
                 
