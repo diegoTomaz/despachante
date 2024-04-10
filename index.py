@@ -2,35 +2,46 @@ import flet as ft
 from db import cursor, banco
 from cliente import Cliente
 
-def mostrarMensagem(msg:str,color:str):
+
+def mostrarMensagem(msg: str, color: str):
     alertMesg.content.value = str(msg)
     alertMesg.content.color = str(color)
     alertMesg.open = True
     body.update()
+
 
 def limparFormCliente():
     txtNome.content.value = ""
     txtCpf.content.value = ""
     txtRg.content.value = ""
     txtEndereco.content.value = ""
-    #pessoa.update()
-    #mostrarMensagem(e)
+    # pessoa.update()
+    # mostrarMensagem(e)
+
 
 def gravarPessoa(e):
     nome = txtNome.content.value
     cpf = txtCpf.content.value
     rg = txtRg.content.value
     endereco = txtEndereco.content.value
-    if(nome == None or (nome.lstrip()) == ""):
-        mostrarMensagem(msg="Informe o nome do cliente!",color=ft.colors.RED)
+    id = txtId.content.value
+    if (nome == None or (nome.lstrip()) == ""):
+        mostrarMensagem(msg="Informe o nome do cliente!", color=ft.colors.RED)
     else:
-        cliente = Cliente(nome= nome, cpf = cpf, rg = rg, endereco = endereco)
-        cliente.gravarCliente()
-        limparFormCliente()
-        mostrarMensagem(msg="Cliente cadastrado!",color=ft.colors.GREEN)
-        atualizarGridPessoas()
-   
-
+        if (id != None):
+            cliente = Cliente(nome=nome, cpf=cpf, rg=rg,
+                              endereco=endereco)
+            cliente.atualizarCliente(id)
+            limparFormCliente()
+            mostrarMensagem(msg="Cliente atualizado!",
+                            color=ft.colors.GREEN)
+            atualizarGridPessoas()
+        else:
+            cliente = Cliente(nome=nome, cpf=cpf, rg=rg, endereco=endereco)
+            cliente.gravarCliente()
+            limparFormCliente()
+            mostrarMensagem(msg="Cliente cadastrado!", color=ft.colors.GREEN)
+            atualizarGridPessoas()
 
 
 txtNome = ft.Container(content=ft.TextField(
@@ -61,17 +72,23 @@ txtEndereco = ft.Container(content=ft.TextField(
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200
 ), expand=True)
+txtId = ft.Container(content=ft.TextField(
+    label='ID',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200
+), expand=True)
 
 
 alertMesg = ft.SnackBar(
-        content=ft.Text("Cliente cadastrado!",color=ft.colors.GREEN,size=25),
-        open=False,
-        bgcolor=ft.colors.WHITE,
-        show_close_icon=True,
-        padding=20,
-        close_icon_color = ft.colors.RED
-    )
-
+    content=ft.Text("Cliente cadastrado!", color=ft.colors.GREEN, size=25),
+    open=False,
+    bgcolor=ft.colors.WHITE,
+    show_close_icon=True,
+    padding=20,
+    close_icon_color=ft.colors.RED
+)
 
 
 btnStyle = ft.ButtonStyle(
@@ -92,78 +109,100 @@ btnGravar = ft.ElevatedButton(
     text="Gravar", icon=ft.icons.ADD_ROUNDED, style=btnStyle, on_click=gravarPessoa)
 
 
-def updateOnTap():
-    pass
+def excluir_cliente(e):
+    print(e.control.data, ' was clicked')
 
-def teste():
-    pass
+
+def editar_cliente(e):
+    print(e.control.data, ' was clicked')
+    print(e.control.data[1], ' was clicked')
+    print(e.control.data[2], ' was clicked')
+    print(e.control.data[3], ' was clicked')
+    print(e.control.data[4], ' was clicked')
+
+    txtNome.content.value = e.control.data[1]
+    txtCpf.content.value = e.control.data[2]
+    txtRg.content.value = e.control.data[3]
+    txtEndereco.content.value = e.control.data[4]
+    txtId.content.value = e.control.data[0]
+    pessoa.update()
+
 
 linhasTabela = [
-                
-            ]
-tabelaPessoas =  ft.DataTable(
-            expand_loose=False,
-            bgcolor=ft.colors.WHITE,
-            border=ft.border.all(2, ft.colors.BLUE_100),
-            border_radius=10,
-            vertical_lines=ft.border.BorderSide(3, ft.colors.BLUE_100),
-            horizontal_lines=ft.border.BorderSide(1, ft.colors.BLUE_100),
-            heading_row_color=ft.colors.BLUE_100,
-            data_row_color={"hovered": "0x30FF0000"},
-            columns=[
-                ft.DataColumn(ft.Text("Nome")),
-                ft.DataColumn(ft.Text("Cpf")),
-                ft.DataColumn(ft.Text("Rg")),
-                ft.DataColumn(ft.Text("Endereço")),
-                ft.DataColumn(ft.Text("")),
-            ],
-            rows=linhasTabela
-        )
+
+]
+tabelaPessoas = ft.DataTable(
+    expand_loose=False,
+    bgcolor=ft.colors.WHITE,
+    border=ft.border.all(2, ft.colors.BLUE_100),
+    border_radius=10,
+    vertical_lines=ft.border.BorderSide(3, ft.colors.BLUE_100),
+    horizontal_lines=ft.border.BorderSide(1, ft.colors.BLUE_100),
+    heading_row_color=ft.colors.BLUE_100,
+    data_row_color={"hovered": "0x30FF0000"},
+    columns=[
+        ft.DataColumn(ft.Text("Nome")),
+        ft.DataColumn(ft.Text("Cpf")),
+        ft.DataColumn(ft.Text("Rg")),
+        ft.DataColumn(ft.Text("Endereço")),
+        ft.DataColumn(ft.Text("")),
+    ],
+    rows=linhasTabela
+)
 
 
-cliente = Cliente(nome= "oi", cpf = "oi", rg = "oi", endereco = "oi")
-clientes = cliente.ulimosCliente() 
+cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+clientes = cliente.ulimosCliente()
 
 tabelaPessoas.rows = []
 
 for cl in clientes:
     tabelaPessoas.rows.append(ft.DataRow(
-                cells=[
-                    ft.DataCell(ft.Text(str(cl[1]))),
-                    ft.DataCell(ft.Text(str(cl[2]))),
-                    ft.DataCell(ft.Text(str(cl[3]))),
-                    ft.DataCell(ft.Text(str(cl[4]))),
-                    ft.DataCell(ft.Text(str("oi")),show_edit_icon=True, on_tap=updateOnTap),
-                ],
-            ))
-    
+        cells=[
+            ft.DataCell(ft.Text(str(cl[1]))),
+            ft.DataCell(ft.Text(str(cl[2]))),
+            ft.DataCell(ft.Text(str(cl[3]))),
+            ft.DataCell(ft.Text(str(cl[4]))),
+            ft.DataCell(
+                ft.Row([
+                    ft.IconButton("edit", icon_color="blue",
+                                  data=cl, tooltip="Editar", on_click=editar_cliente),
+                    ft.IconButton("delete", icon_color="red",
+                                  data=cl[0], tooltip="Excluir", on_click=excluir_cliente),
+                ])),
+        ],
+    ))
 
+    # s,#
 
-     #s,#
-    
 gridPessoas = ft.Container(
-    content=ft.Column(controls=[tabelaPessoas],scroll=ft.ScrollMode.ALWAYS,horizontal_alignment=ft.CrossAxisAlignment.STRETCH), 
+    content=ft.Column(controls=[tabelaPessoas], scroll=ft.ScrollMode.ALWAYS,
+                      horizontal_alignment=ft.CrossAxisAlignment.STRETCH),
     expand=True)
 
 
-
-
 def atualizarGridPessoas():
-    cliente = Cliente(nome= "oi", cpf = "oi", rg = "oi", endereco = "oi")
-    clientes = cliente.ulimosCliente() 
-   
+    cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+    clientes = cliente.ulimosCliente()
+
     tabelaPessoas.rows = []
-    
+
     for cl in clientes:
         tabelaPessoas.rows.append(ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text(str(cl[1]))),
-                        ft.DataCell(ft.Text(str(cl[2]))),
-                        ft.DataCell(ft.Text(str(cl[3]))),
-                        ft.DataCell(ft.Text(str(cl[4]))),
-                        ft.DataCell(ft.Text(str("oi")),show_edit_icon=True, on_tap=updateOnTap),
-                    ],
-                ))
+            cells=[
+                ft.DataCell(ft.Text(str(cl[1]))),
+                ft.DataCell(ft.Text(str(cl[2]))),
+                ft.DataCell(ft.Text(str(cl[3]))),
+                ft.DataCell(ft.Text(str(cl[4]))),
+                ft.DataCell(
+                    ft.Row([
+                        ft.IconButton("edit", icon_color="blue",
+                                      data=cl, tooltip="Editar", on_click=editar_cliente),
+                        ft.IconButton("delete", icon_color="red",
+                                      data=cl[0], tooltip="Excluir",  on_click=excluir_cliente),
+                    ])),
+            ],
+        ))
 
     # tabelaPessoas.rows.insert(0,ft.DataRow(
     #                 cells=[
@@ -173,13 +212,11 @@ def atualizarGridPessoas():
     #                     ft.DataCell(ft.Text("43")),
     #                 ],
     #             ))
-    
+
     tabelaPessoas.update()
 
 
-
-
-pessoa = ft.Column( scroll=ft.ScrollMode.ALWAYS,controls=[
+pessoa = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
     ft.Container(
         bgcolor=ft.colors.WHITE,
         content=ft.Column(
@@ -201,6 +238,10 @@ pessoa = ft.Column( scroll=ft.ScrollMode.ALWAYS,controls=[
                     content=ft.Row(controls=[
                         txtEndereco
                     ])),
+                ft.Container(
+                    content=ft.Row(controls=[
+                        txtId
+                    ])),
                 ft.Row(
                     controls=[
                         btnGravar,
@@ -219,8 +260,8 @@ pessoa = ft.Column( scroll=ft.ScrollMode.ALWAYS,controls=[
             controls=[
                 ft.Row(
                     controls=[
-                     gridPessoas,
-                       
+                        gridPessoas,
+
                     ],
 
 
@@ -245,7 +286,7 @@ body = ft.Row(
 
         ft.Column(
             expand=True,
-           
+
             controls=[
                 ft.Container(bgcolor=ft.colors.BLUE,
                              expand=True,
@@ -288,9 +329,6 @@ def main(page: ft.Page):
     page.title = "Rasput"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 0
-   
-
-
 
     rail = ft.NavigationRail(
         selected_index=1,
@@ -325,7 +363,7 @@ def main(page: ft.Page):
                 rail,
                 vermelho,
                 body,
-                
+
 
             ],
             expand=True,
