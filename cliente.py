@@ -26,6 +26,16 @@ class Cliente:
         cursor.execute(update_cliente, attCliente)
         banco.commit()
 
+    def excluirCliente(self, id) -> None:
+
+        delete_cliente = 'DELETE from clientes where id= ?'
+
+        # print(update_cliente)
+        excCliente = [id]
+
+        cursor.execute(delete_cliente, excCliente)
+        banco.commit()
+
     def ulimosCliente(self):
         pesquisa_clientes = 'SELECT * from clientes ORDER BY ID DESC LIMIT 20'
 

@@ -15,6 +15,8 @@ def limparFormCliente():
     txtCpf.content.value = ""
     txtRg.content.value = ""
     txtEndereco.content.value = ""
+    txtId.content.value = ""
+    txtIdExclusao.content.value = ""
     # pessoa.update()
     # mostrarMensagem(e)
 
@@ -79,6 +81,13 @@ txtId = ft.Container(content=ft.TextField(
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200
 ), expand=True)
+txtIdExclusao = ft.Container(content=ft.TextField(
+    label='ID exlusao',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200
+), expand=True)
 
 
 alertMesg = ft.SnackBar(
@@ -109,17 +118,47 @@ btnGravar = ft.ElevatedButton(
     text="Gravar", icon=ft.icons.ADD_ROUNDED, style=btnStyle, on_click=gravarPessoa)
 
 
+def fecharModal(e):
+    confirmaExclusao.open = False
+    pessoa.update()
+
+
 def excluir_cliente(e):
-    print(e.control.data, ' was clicked')
+    print(txtIdExclusao.content.value)
+    id = txtIdExclusao.content.value
+
+    if (id != None):
+        cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+        cliente.excluirCliente(id)
+        limparFormCliente()
+        mostrarMensagem(msg="Cliente excluído!",
+                        color=ft.colors.GREEN)
+        atualizarGridPessoas()
+        fecharModal(e)
+
+
+confirmaExclusao = ft.AlertDialog(
+    modal=True,
+    title=ft.Text("Tem certeza?"),
+    content=ft.Text("Essa operaçâo não poderá ser desfeita"),
+    actions=[
+        ft.TextButton("Sim", on_click=excluir_cliente),
+        ft.TextButton("Não", on_click=fecharModal),
+    ],
+    actions_alignment=ft.MainAxisAlignment.END,
+    # on_dismiss=lambda e: print("Modal dialog dismissed!"),
+)
+
+
+def confirma_excluir_cliente(e):
+    txtIdExclusao.content.value = e.control.data
+    pessoa.update()
+
+    confirmaExclusao.open = True
+    pessoa.update()
 
 
 def editar_cliente(e):
-    print(e.control.data, ' was clicked')
-    print(e.control.data[1], ' was clicked')
-    print(e.control.data[2], ' was clicked')
-    print(e.control.data[3], ' was clicked')
-    print(e.control.data[4], ' was clicked')
-
     txtNome.content.value = e.control.data[1]
     txtCpf.content.value = e.control.data[2]
     txtRg.content.value = e.control.data[3]
@@ -168,7 +207,7 @@ for cl in clientes:
                     ft.IconButton("edit", icon_color="blue",
                                   data=cl, tooltip="Editar", on_click=editar_cliente),
                     ft.IconButton("delete", icon_color="red",
-                                  data=cl[0], tooltip="Excluir", on_click=excluir_cliente),
+                                  data=cl[0], tooltip="Excluir", on_click=confirma_excluir_cliente),
                 ])),
         ],
     ))
@@ -199,7 +238,7 @@ def atualizarGridPessoas():
                         ft.IconButton("edit", icon_color="blue",
                                       data=cl, tooltip="Editar", on_click=editar_cliente),
                         ft.IconButton("delete", icon_color="red",
-                                      data=cl[0], tooltip="Excluir",  on_click=excluir_cliente),
+                                      data=cl[0], tooltip="Excluir",  on_click=confirma_excluir_cliente),
                     ])),
             ],
         ))
@@ -242,13 +281,19 @@ pessoa = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                     content=ft.Row(controls=[
                         txtId
                     ])),
+                ft.Container(
+                    content=ft.Row(controls=[
+                        txtIdExclusao
+                    ])),
+
                 ft.Row(
                     controls=[
                         btnGravar,
                     ],
                     alignment=ft.MainAxisAlignment.END,
                 ),
-                alertMesg
+                alertMesg,
+                confirmaExclusao
             ],
         ),
         margin=ft.margin.all(50),
