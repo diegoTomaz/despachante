@@ -42,3 +42,9 @@ class Cliente:
         cursor.execute(pesquisa_clientes)
         clientes = cursor.fetchall()
         return clientes
+
+    def pesquisaCliente(self, nome):
+        pesquisa_clientes = f'SELECT * from clientes where nome like "%{nome}%" ORDER BY ID DESC'
+        cursor.execute(pesquisa_clientes)
+        clientes = cursor.fetchall()
+        return clientes
