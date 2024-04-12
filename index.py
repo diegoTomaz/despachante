@@ -1,6 +1,7 @@
 import flet as ft
 from db import cursor, banco
 from cliente import Cliente
+from despacho import Despacho
 
 
 def mostrarMensagem(msg: str, color: str):
@@ -15,6 +16,7 @@ def limparFormCliente():
     txtCpf.content.value = ""
     txtRg.content.value = ""
     txtEndereco.content.value = ""
+    txtTelefone.content.value = ""
     txtId.content.value = ""
     txtIdExclusao.content.value = ""
     pesquisaPessoa.value = ""
@@ -27,24 +29,27 @@ def gravarPessoa(e):
     cpf = txtCpf.content.value
     rg = txtRg.content.value
     endereco = txtEndereco.content.value
+    telefone = txtTelefone.content.value
     id = txtId.content.value
     if (nome == None or (nome.lstrip()) == ""):
         mostrarMensagem(msg="Informe o nome do cliente!", color=ft.colors.RED)
     else:
         if (id != None and id != ""):
             cliente = Cliente(nome=nome, cpf=cpf, rg=rg,
-                              endereco=endereco)
+                              endereco=endereco, telefone=telefone)
             cliente.atualizarCliente(id)
             limparFormCliente()
             mostrarMensagem(msg="Cliente atualizado!",
                             color=ft.colors.GREEN)
             atualizarGridPessoas()
         else:
-            cliente = Cliente(nome=nome, cpf=cpf, rg=rg, endereco=endereco)
+            cliente = Cliente(nome=nome, cpf=cpf, rg=rg,
+                              endereco=endereco, telefone=telefone)
             cliente.gravarCliente()
             limparFormCliente()
             mostrarMensagem(msg="Cliente cadastrado!", color=ft.colors.GREEN)
             atualizarGridPessoas()
+            # irPraCliente()
 
 
 txtNome = ft.Container(content=ft.TextField(
@@ -75,6 +80,13 @@ txtEndereco = ft.Container(content=ft.TextField(
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200
 ), expand=True)
+txtTelefone = ft.Container(content=ft.TextField(
+    label='Telefone',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+))
 txtId = ft.Container(content=ft.TextField(
     label='ID',
     label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
@@ -127,11 +139,11 @@ def fecharModal(e):
 
 
 def excluir_cliente(e):
-    print(txtIdExclusao.content.value)
     id = txtIdExclusao.content.value
 
     if (id != None):
-        cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+        cliente = Cliente(nome="oi", cpf="oi", rg="oi",
+                          endereco="oi", telefone="oi")
         cliente.excluirCliente(id)
         limparFormCliente()
         mostrarMensagem(msg="Cliente excluído!",
@@ -166,6 +178,7 @@ def editar_cliente(e):
     txtCpf.content.value = e.control.data[2]
     txtRg.content.value = e.control.data[3]
     txtEndereco.content.value = e.control.data[4]
+    txtTelefone.content.value = e.control.data[5]
     txtId.content.value = e.control.data[0]
     pessoa.update()
 
@@ -187,13 +200,14 @@ tabelaPessoas = ft.DataTable(
         ft.DataColumn(ft.Text("Cpf")),
         ft.DataColumn(ft.Text("Rg")),
         ft.DataColumn(ft.Text("Endereço")),
+        ft.DataColumn(ft.Text("Telefone")),
         ft.DataColumn(ft.Text("")),
     ],
     rows=linhasTabela
 )
 
 
-cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi", telefone="oi")
 clientes = cliente.ulimosCliente()
 
 tabelaPessoas.rows = []
@@ -205,6 +219,7 @@ for cl in clientes:
             ft.DataCell(ft.Text(str(cl[2]))),
             ft.DataCell(ft.Text(str(cl[3]))),
             ft.DataCell(ft.Text(str(cl[4]))),
+            ft.DataCell(ft.Text(str(cl[5]))),
             ft.DataCell(
                 ft.Row([
                     ft.IconButton("edit", icon_color="blue",
@@ -217,14 +232,14 @@ for cl in clientes:
 
 
 def limparPesquisa(e):
-    print(pesquisaPessoa.value)
     pesquisaPessoa.value = ""
     search(e)
 
 
 def search(e):
     nome = pesquisaPessoa.value.upper()
-    cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+    cliente = Cliente(nome="oi", cpf="oi", rg="oi",
+                      endereco="oi", telefone="oi")
    # cliente.pesquisaCliente(nome)
     clientes = cliente.pesquisaCliente(nome)
 
@@ -237,6 +252,7 @@ def search(e):
                 ft.DataCell(ft.Text(str(cl[2]))),
                 ft.DataCell(ft.Text(str(cl[3]))),
                 ft.DataCell(ft.Text(str(cl[4]))),
+                ft.DataCell(ft.Text(str(cl[5]))),
                 ft.DataCell(
                     ft.Row([
                         ft.IconButton("edit", icon_color="blue",
@@ -267,7 +283,8 @@ gridPessoas = ft.Container(
 
 
 def atualizarGridPessoas():
-    cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+    cliente = Cliente(nome="oi", cpf="oi", rg="oi",
+                      endereco="oi", telefone="oi")
     clientes = cliente.ulimosCliente()
 
     tabelaPessoas.rows = []
@@ -279,6 +296,7 @@ def atualizarGridPessoas():
                 ft.DataCell(ft.Text(str(cl[2]))),
                 ft.DataCell(ft.Text(str(cl[3]))),
                 ft.DataCell(ft.Text(str(cl[4]))),
+                ft.DataCell(ft.Text(str(cl[5]))),
                 ft.DataCell(
                     ft.Row([
                         ft.IconButton("edit", icon_color="blue",
@@ -321,7 +339,8 @@ pessoa = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
 
                 ft.Container(
                     content=ft.Row(controls=[
-                        txtEndereco
+                        txtEndereco,
+                        txtTelefone
                     ])),
                 ft.Container(
                     content=ft.Row(controls=[
@@ -373,13 +392,87 @@ pessoa = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
 ############################## DESPACHO#######################################################################################
 
 
-def gravarDespacho():
-    pass
+def limparFormDespacho():
+    searchCliente.data = None
+    searchCliente.value = ""
+    searchCliente.controls = []
+    txtPlaca.content.value = ""
+    txtVeiculo.content.value = ""
+    txtMarca.content.value = ""
+    txtAnoVeiculo.content.value = ""
+    txtCor.content.value = ""
+    txtChassi.content.value = ""
+    txtCombustivel.content.value = ""
+    txtRenavam.content.value = ""
+    txtNumeroMotor.content.value = ""
+    txtValor.content.value = ""
+    txtDataAquisicao.content.value = ""
+    txtDataServico.content.value = ""
+    txtValorServico.content.value = ""
+    txtObservacao.content.value = ""
+    txtIdDespacho.content.value = ""
+    # irParaClienteDespacho()
+    # irParaDespacho()
+
+
+def mostrarMensagemDespacho(msg: str, color: str):
+    alertMesgDespacho.content.value = str(msg)
+    alertMesgDespacho.content.color = str(color)
+    alertMesgDespacho.open = True
+    body.update()
+
+
+def gravarDespacho(e):
+    clienteId = searchCliente.data
+    placa = txtPlaca.content.value
+    veiculo = txtVeiculo.content.value
+    marca = txtMarca.content.value
+    ano_veiculo = txtAnoVeiculo.content.value
+    cor = txtCor.content.value
+    chassi = txtChassi.content.value
+    combustivel = txtCombustivel.content.value
+    renavam = txtRenavam.content.value
+    numero_motor = txtNumeroMotor.content.value
+    valor = txtValor.content.value
+    data_aquisicao = txtDataAquisicao.content.value
+    data_servico = txtDataServico.content.value
+    valor_servico = txtValorServico.content.value
+    observacao = txtObservacao.content.value
+    idDespacho = txtIdDespacho.content.value
+
+    # print(f"cleinte{cliente} placa{placa} veiculo{veiculo} marca{marca} anoVei{ano_veiculo} cor{cor} chassi{chassi} combus{combustivel} renavam{renavam} numeroMot{numero_motor} valor{valor} dataAqui{data_aquisicao} data_serv{data_servico} valorSer{valor_servico} obs{observacao}")
+    print(searchCliente)
+    if (placa == None or (placa.lstrip()) == ""):
+        mostrarMensagemDespacho(msg="Informe a placa!", color=ft.colors.RED)
+    elif (clienteId == None or (clienteId.lstrip()) == ""):
+        mostrarMensagemDespacho(msg="Informe o cliente!", color=ft.colors.RED)
+    else:
+        if (idDespacho != None and idDespacho != ""):
+            pass
+            # despacho = Cliente(nome=nome, cpf=cpf, rg=rg,
+            #                    endereco=endereco, telefone=telefone)
+            # cliente.atualizarCliente(idDespacho)
+            # limparFormCliente()
+            # mostrarMensagem(msg="Cliente atualizado!",
+            #                 color=ft.colors.GREEN)
+            # atualizarGridPessoas()
+        else:
+            despacho = Despacho(placa=placa, veiculo=veiculo, marca=marca,
+                                ano_veiculo=ano_veiculo, cor=cor, chassi=chassi,
+                                combustivel=combustivel, renavam=renavam, numero_motor=numero_motor,
+                                valor=valor, data_aquisicao=data_aquisicao, data_servico=data_servico,
+                                valor_servico=valor_servico, observacao=observacao, cliente_id=clienteId)
+            despacho.gravarDespacho()
+            limparFormDespacho()
+            mostrarMensagemDespacho(
+                msg="Despacho cadastrado!", color=ft.colors.GREEN)
+            # atualizarGridDespacho()
 
 
 def clienteEscolhido(e):
    # print(e.control.data)
     text = f"{e.control.data[1]}"
+    searchCliente.data = f"{e.control.data[0]}"
     # print(f"closing view from {text}")
     searchCliente.close_view(text)
 
@@ -387,7 +480,8 @@ def clienteEscolhido(e):
 def pesquisarClientes(e):
 
     nome = searchCliente.value.upper()
-    cliente = Cliente(nome="oi", cpf="oi", rg="oi", endereco="oi")
+    cliente = Cliente(nome="oi", cpf="oi", rg="oi",
+                      endereco="oi", telefone="oi")
     clientes = cliente.pesquisaCliente(nome)
     searchCliente.close_view()
     searchCliente.controls = []
@@ -396,7 +490,6 @@ def pesquisarClientes(e):
         searchCliente.controls.append(ft.ListTile(title=ft.Text(
             value=str(cl[1])), on_click=clienteEscolhido, data=cl)
         )
-    print(searchCliente.controls)
 
     searchCliente.open_view()
 
@@ -410,6 +503,8 @@ searchCliente = ft.SearchBar(
     view_elevation=4,
     divider_color=ft.colors.AMBER,
     bar_hint_text="Pesquisar cliente...",
+    view_hint_text="Suggestions...",
+    data=None,
     # view_hint_text="Choose a color from the suggestions...",
     on_change=fecharView,
     on_submit=pesquisarClientes,
@@ -445,6 +540,139 @@ confirmaExclusaoDespacho = ft.AlertDialog(
     # on_dismiss=lambda e: print("Modal dialog dismissed!"),
 )
 
+
+txtPlaca = ft.Container(content=ft.TextField(
+    label='Placa',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+
+
+), expand=True)
+
+txtVeiculo = ft.Container(content=ft.TextField(
+    label='Veículo',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtMarca = ft.Container(content=ft.TextField(
+    label='Marca',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtAnoVeiculo = ft.Container(content=ft.TextField(
+    label='Ano',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtCor = ft.Container(content=ft.TextField(
+    label='Cor',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtChassi = ft.Container(content=ft.TextField(
+    label='Chassi',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtCombustivel = ft.Container(content=ft.TextField(
+    label='Combustível',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtRenavam = ft.Container(content=ft.TextField(
+    label='Renavam',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtNumeroMotor = ft.Container(content=ft.TextField(
+    label='Número motor',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtValor = ft.Container(content=ft.TextField(
+    label='Valor',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtDataAquisicao = ft.Container(content=ft.TextField(
+    label='Data aquisição',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtDataServico = ft.Container(content=ft.TextField(
+    label='Data serviço',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtValorServico = ft.Container(content=ft.TextField(
+    label='Valor serviço',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtObservacao = ft.Container(content=ft.TextField(
+    label='Observação',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+), expand=True)
+
+txtIdDespacho = ft.Container(content=ft.TextField(
+    label='ID',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+    visible=False
+), expand=True)
+txtIdExclusaoDespacho = ft.Container(content=ft.TextField(
+    label='ID exlusao',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+    visible=False
+), expand=True)
+
+
 despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
     ft.Container(
         bgcolor=ft.colors.WHITE,
@@ -455,6 +683,49 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                         searchCliente,
                     ],
 
+
+                ),
+                ft.Row(
+                    controls=[
+                        txtPlaca,
+                        txtVeiculo,
+                        txtMarca,
+
+                    ],
+                ),
+                ft.Row(
+                    controls=[
+                        txtAnoVeiculo,
+                        txtCor,
+                        txtChassi,
+                    ],
+                ),
+
+                ft.Row(
+                    controls=[
+                        txtCombustivel,
+                        txtRenavam,
+                        txtNumeroMotor,
+                    ],
+                ),
+                ft.Row(
+                    controls=[
+                        txtValor,
+                        txtDataAquisicao,
+                        txtDataServico,
+                        txtValorServico,
+                    ],
+                ),
+                ft.Row(
+                    controls=[
+                        txtObservacao,
+                    ],
+                ),
+                ft.Row(
+                    controls=[
+                        txtIdDespacho,
+                        txtIdExclusaoDespacho
+                    ],
 
                 ),
 
@@ -504,6 +775,29 @@ vermelho = ft.Column(
     ],
 
 )
+
+
+# def irParaClienteDespacho():
+#     body.controls[0].controls[0].content = pessoa
+#     body.update()
+#     body.controls[0].controls[0].content = despacho
+#     vermelho.controls[0].margin = ft.margin.only(top=100)
+#     vermelho.update()
+#     body.update()
+
+
+def irParaDespacho():
+    body.controls[0].controls[0].content = despacho
+    vermelho.controls[0].margin = ft.margin.only(top=100)
+    vermelho.update()
+    body.update()
+
+
+def irParaCliente():
+    body.controls[0].controls[0].content = pessoa
+    vermelho.controls[0].margin = ft.margin.only(top=40)
+    vermelho.update()
+    body.update()
 
 
 def changeBody(e):
