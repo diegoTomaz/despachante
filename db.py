@@ -19,7 +19,6 @@ tabela_despacho = """
                 CREATE TABLE IF NOT EXISTS despacho
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                 placa text,
-                automovel text,
                 veiculo text,
                 marca text,
                 ano_veiculo text,

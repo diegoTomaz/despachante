@@ -2,27 +2,28 @@ from db import cursor, banco
 
 
 class Despacho:
-    def __init__(self, placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor, valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id) -> None:
-        self.placa = placa
-        self.veiculo = veiculo
-        self.marca = marca
-        self.ano_veiculo = ano_veiculo
-        self.cor = cor
-        self.chassi = chassi
-        self.combustivel = combustivel
-        self.renavam = renavam
-        self.numero_motor = numero_motor
-        self.valor = valor
-        self.data_aquisicao = data_aquisicao
-        self.data_servico = data_servico
-        self.valor_servico = valor_servico
-        self.observacao = observacao
-        self.cliente_id = cliente_id
+    # def __init__(self, placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor, valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id) -> None:
+    # self.placa = placa
+    # self.veiculo = veiculo
+    # self.marca = marca
+    # self.ano_veiculo = ano_veiculo
+    # self.cor = cor
+    # self.chassi = chassi
+    # self.combustivel = combustivel
+    # self.renavam = renavam
+    # self.numero_motor = numero_motor
+    # self.valor = valor
+    # self.data_aquisicao = data_aquisicao
+    # self.data_servico = data_servico
+    # self.valor_servico = valor_servico
+    # self.observacao = observacao
+    # self.cliente_id = cliente_id
 
     def gravarDespacho(self):
         insert_despacho = """
-                        INSERT INTO despacho 
-                        (placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor, valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id) 
+                        INSERT INTO despacho
+                        (placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor,
+                         valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id)
                         VALUES (?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?)
                         """
         novoDespacho = [self.placa,
@@ -46,37 +47,124 @@ class Despacho:
         banco.commit()
         return True
 
-    def atualizarCliente(self, id) -> None:
+    def atualizarDespacho(self, id) -> None:
         # update_cliente = f'UPDATE clientes set nome = "{self.nome}", cpf="{self.cpf}", rg ="{self.rg}", endereco="{self.endereco}" where id= {id}'
 
-        update_cliente = 'UPDATE clientes set nome = ?, cpf=?, rg =?, endereco=? , telefone=? where id= ?'
+        update_despacho = '''
+                        UPDATE despacho 
+                        set placa = ?, 
+                        veiculo=?, 
+                        marca =?,
+                        ano_veiculo=? , 
+                        cor=? ,
+                        chassi=? ,
+                        combustivel=? ,
+                        renavam=? ,
+                        numero_motor=? ,
+                        valor=? ,
+                        data_aquisicao=? ,
+                        data_servico=? ,
+                        valor_servico=? ,
+                        observacao=? ,
+                        cliente_id=? 
+                        where id= ?
+                        '''
 
         # print(update_cliente)
-        attCliente = [self.nome, self.cpf, self.rg,
-                      self.endereco, self.telefone, id]
+        attDespacho = [
+            self.placa,
+            self.veiculo,
+            self.marca,
+            self.ano_veiculo,
+            self.cor,
+            self.chassi,
+            self.combustivel,
+            self.renavam,
+            self.numero_motor,
+            self.valor,
+            self.data_aquisicao,
+            self.data_servico,
+            self.valor_servico,
+            self.observacao,
+            self.cliente_id,
+            id
+        ]
 
-        cursor.execute(update_cliente, attCliente)
+        cursor.execute(update_despacho, attDespacho)
         banco.commit()
 
-    def excluirCliente(self, id) -> None:
+    def excluirDespacho(self, id) -> None:
 
-        delete_cliente = 'DELETE from clientes where id= ?'
+        delete_despacho = 'DELETE from despacho where id= ?'
 
         # print(update_cliente)
-        excCliente = [id]
+        excDesp = [id]
 
-        cursor.execute(delete_cliente, excCliente)
+        cursor.execute(delete_despacho, excDesp)
         banco.commit()
 
-    def ulimosCliente(self):
-        pesquisa_clientes = 'SELECT id,nome,cpf,rg,endereco,telefone from clientes ORDER BY ID DESC LIMIT 20'
+    def ultimosDespachos():
+        pesquisa_despachos = '''
+                   SELECT
+                    C.nome,
+                    D.PLACA,
+                    D.veiculo,
+                    D.marca,
+                    D.ano_veiculo,
+                    D.cor,
+                    D.chassi,
+                    D.combustivel,
+                    D.renavam,
+                    D.numero_motor,
+                    D.valor,
+                    D.data_aquisicao,
+                    D.data_servico,
+                    D.valor_servico,
+                    D.observacao,
+                    D.id,
+                    C.ID
 
-        cursor.execute(pesquisa_clientes)
-        clientes = cursor.fetchall()
-        return clientes
+                FROM
+                    despacho D
+                INNER JOIN
+                clientes C
+                ON D.cliente_id = C.id
+                order by d.id   DESC LIMIT 20
+                    '''
 
-    def pesquisaCliente(self, nome):
-        pesquisa_clientes = f'SELECT id,nome,cpf,rg,endereco,telefone from clientes where nome like "%{nome}%" ORDER BY ID DESC'
-        cursor.execute(pesquisa_clientes)
-        clientes = cursor.fetchall()
-        return clientes
+        cursor.execute(pesquisa_despachos)
+        despachos = cursor.fetchall()
+        return despachos
+
+    def pesquisaDespacho(self, valor):
+        pesquisa_despachos = f'''
+                   SELECT
+                    C.nome,
+                    D.PLACA,
+                    D.veiculo,
+                    D.marca,
+                    D.ano_veiculo,
+                    D.cor,
+                    D.chassi,
+                    D.combustivel,
+                    D.renavam,
+                    D.numero_motor,
+                    D.valor,
+                    D.data_aquisicao,
+                    D.data_servico,
+                    D.valor_servico,
+                    D.observacao,
+                    D.id,
+                    C.id
+
+                FROM
+                    despacho D
+                INNER JOIN
+                clientes C
+                ON D.cliente_id = C.id
+                where c.nome like "%{valor}%" OR c.cpf like "%{valor}%" OR d.placa like "%{valor}%"
+                order by d.id   
+                    '''
+        cursor.execute(pesquisa_despachos)
+        despachos = cursor.fetchall()
+        return despachos

@@ -44,7 +44,7 @@ class Cliente:
         cursor.execute(delete_cliente, excCliente)
         banco.commit()
 
-    def ulimosCliente(self):
+    def ultimosCliente(self):
         pesquisa_clientes = 'SELECT id,nome,cpf,rg,endereco,telefone from clientes ORDER BY ID DESC LIMIT 20'
 
         cursor.execute(pesquisa_clientes)
