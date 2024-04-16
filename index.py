@@ -2,6 +2,7 @@ import flet as ft
 from db import cursor, banco
 from cliente import Cliente
 from despacho import Despacho
+import datetime
 
 
 def mostrarMensagem(msg: str, color: str):
@@ -819,6 +820,33 @@ txtIdExclusaoDespacho = ft.Container(content=ft.TextField(
 ), expand=True)
 
 
+def data_aquisicao_alterada(e):
+    txtDataAquisicao.content.value = date_picker_aquisicao.value
+    # dataAq = datetime(date_picker_aquisicao.value)
+    # print(dataAq)
+
+    data2 = datetime.strptime(date_picker_aquisicao.value, "%d/%m/%Y")
+
+    print(data2)
+    print(date_picker_aquisicao.value)
+    txtDataAquisicao.update()
+
+
+date_picker_aquisicao = ft.DatePicker(
+    on_change=data_aquisicao_alterada,
+    # on_dismiss=date_picker_dismissed,
+    first_date=datetime.datetime(2024, 1, 1),
+    # last_date=datetime.datetime(2024, 10, 1),
+)
+
+
+date_button_aquisicao = ft.Container(content=ft.ElevatedButton(
+    "Data da aquisição",
+    icon=ft.icons.CALENDAR_MONTH,
+    on_click=lambda _: date_picker_aquisicao.pick_date(),
+), expand=True)
+
+
 tabelaDespacho = ft.DataTable(
     expand_loose=False,
     bgcolor=ft.colors.WHITE,
@@ -1004,7 +1032,9 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                 ft.Row(
                     controls=[
                         txtIdDespacho,
-                        txtIdExclusaoDespacho
+                        txtIdExclusaoDespacho,
+                        date_button_aquisicao,
+                        date_picker_aquisicao
                     ],
 
                 ),
@@ -1123,6 +1153,13 @@ def main(page: ft.Page):
     page.title = "Rasput"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 0
+
+    page.locale_configuration = ft.LocaleConfiguration(
+        supported_locales=[
+            ft.Locale("pt", "BR"),
+        ],
+        current_locale=ft.Locale("pt", "BR"),
+    )
 
     rail = ft.NavigationRail(
         selected_index=1,
