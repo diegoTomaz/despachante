@@ -946,10 +946,10 @@ for desp in despachos:
 
 def limparPesquisaDespacho(e):
     pesquisaDespacho.value = ""
-    pesquisaDespacho(e)
+    pesquisandoDespacho(e)
 
 
-def pesquisaDespacho(e):
+def pesquisandoDespacho(e):
     valor = pesquisaDespacho.value.upper()
     despachoPesqu = Despacho()
     despachos = despachoPesqu.pesquisaDespacho(valor)
@@ -989,7 +989,7 @@ def pesquisaDespacho(e):
 pesquisaDespacho = ft.TextField(
     prefix_icon=ft.icons.SEARCH,
     hint_text='Digite o nome, cpf ou placa para buscar...',
-    on_submit=pesquisaDespacho
+    on_submit=pesquisandoDespacho
 )
 
 
