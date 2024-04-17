@@ -1,3 +1,9 @@
 .venv
 __pycache__
 despachante.db
+build
+dist
+despachos.xlsx
+despachante.spec
+Despachante.spec
+index.spec
