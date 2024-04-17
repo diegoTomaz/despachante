@@ -2,7 +2,8 @@ import flet as ft
 from db import cursor, banco
 from cliente import Cliente
 from despacho import Despacho
-import datetime
+from datetime import datetime
+import pandas as pd
 
 
 def mostrarMensagem(msg: str, color: str):
@@ -550,10 +551,10 @@ def editar_despacho(e):
     txtCombustivel.content.value = e.control.data[7]
     txtRenavam.content.value = e.control.data[8]
     txtNumeroMotor.content.value = e.control.data[9]
-    txtValor.content.value = e.control.data[10]
+    txtValor.content.value = str(e.control.data[10]).replace(".", ",")
     txtDataAquisicao.content.value = e.control.data[11]
     txtDataServico.content.value = e.control.data[12]
-    txtValorServico.content.value = e.control.data[13]
+    txtValorServico.content.value = str(e.control.data[13]).replace(".", ",")
     txtObservacao.content.value = e.control.data[14]
     txtIdDespacho.content.value = e.control.data[15]
 
@@ -684,6 +685,7 @@ txtIdClienteDespacho = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    visible=False
 
 
 ), expand=True)
@@ -768,6 +770,8 @@ txtValor = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    input_filter=ft.InputFilter(
+        allow=True, regex_string=r"\d+,?\d{0,2}", replacement_string="")
 ), expand=True)
 
 txtDataAquisicao = ft.Container(content=ft.TextField(
@@ -776,6 +780,7 @@ txtDataAquisicao = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    read_only=True
 ), expand=True)
 
 txtDataServico = ft.Container(content=ft.TextField(
@@ -784,6 +789,7 @@ txtDataServico = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    read_only=True
 ), expand=True)
 
 txtValorServico = ft.Container(content=ft.TextField(
@@ -792,6 +798,8 @@ txtValorServico = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    input_filter=ft.InputFilter(
+        allow=True, regex_string=r"\d+,?\d{0,2}", replacement_string="")
 ), expand=True)
 
 txtObservacao = ft.Container(content=ft.TextField(
@@ -808,6 +816,7 @@ txtIdDespacho = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
+    visible=False
 
 ), expand=True)
 txtIdExclusaoDespacho = ft.Container(content=ft.TextField(
@@ -816,26 +825,23 @@ txtIdExclusaoDespacho = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
-    # visible=False
+    visible=False
 ), expand=True)
 
 
 def data_aquisicao_alterada(e):
-    txtDataAquisicao.content.value = date_picker_aquisicao.value
-    # dataAq = datetime(date_picker_aquisicao.value)
-    # print(dataAq)
 
-    data2 = datetime.strptime(date_picker_aquisicao.value, "%d/%m/%Y")
+    dataConverter = date_picker_aquisicao.value
+    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
 
-    print(data2)
-    print(date_picker_aquisicao.value)
+    txtDataAquisicao.content.value = data2.strftime("%d/%m/%Y")
     txtDataAquisicao.update()
 
 
 date_picker_aquisicao = ft.DatePicker(
     on_change=data_aquisicao_alterada,
     # on_dismiss=date_picker_dismissed,
-    first_date=datetime.datetime(2024, 1, 1),
+    first_date=datetime(2024, 1, 1),
     # last_date=datetime.datetime(2024, 10, 1),
 )
 
@@ -844,6 +850,30 @@ date_button_aquisicao = ft.Container(content=ft.ElevatedButton(
     "Data da aquisição",
     icon=ft.icons.CALENDAR_MONTH,
     on_click=lambda _: date_picker_aquisicao.pick_date(),
+), expand=True)
+
+
+def data_servico_alterada(e):
+
+    dataConverter = date_picker_servico.value
+    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
+
+    txtDataServico.content.value = data2.strftime("%d/%m/%Y")
+    txtDataServico.update()
+
+
+date_picker_servico = ft.DatePicker(
+    on_change=data_servico_alterada,
+    # on_dismiss=date_picker_dismissed,
+    first_date=datetime(2024, 1, 1),
+    # last_date=datetime.datetime(2024, 10, 1),
+)
+
+
+date_button_servico = ft.Container(content=ft.ElevatedButton(
+    "Data do serviço",
+    icon=ft.icons.CALENDAR_MONTH,
+    on_click=lambda _: date_picker_servico.pick_date(),
 ), expand=True)
 
 
@@ -1018,9 +1048,15 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                 ),
                 ft.Row(
                     controls=[
-                        txtValor,
+                        date_button_aquisicao,
                         txtDataAquisicao,
+                        date_button_servico,
                         txtDataServico,
+                    ],
+                ),
+                ft.Row(
+                    controls=[
+                        txtValor,
                         txtValorServico,
                     ],
                 ),
@@ -1033,7 +1069,7 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                     controls=[
                         txtIdDespacho,
                         txtIdExclusaoDespacho,
-                        date_button_aquisicao,
+                        date_picker_servico,
                         date_picker_aquisicao
                     ],
 
@@ -1079,6 +1115,157 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
         padding=10,
 
     )
+])
+
+
+def data_inicio(e):
+
+    dataConverter = date_picker_inicio.value
+    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
+
+    txtDataInicio.content.value = data2.strftime("%d/%m/%Y")
+    txtDataInicio.update()
+
+
+date_picker_inicio = ft.DatePicker(
+    on_change=data_inicio,
+    # on_dismiss=date_picker_dismissed,
+    first_date=datetime(2024, 1, 1),
+    # last_date=datetime.datetime(2024, 10, 1),
+)
+
+
+date_button_inicio = ft.Container(content=ft.ElevatedButton(
+    "Data Inicial",
+    icon=ft.icons.CALENDAR_MONTH,
+    on_click=lambda _: date_picker_inicio.pick_date(),
+), expand=True)
+
+
+txtDataInicio = ft.Container(content=ft.TextField(
+    label='Data Inicial',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+    read_only=True
+), expand=True)
+
+
+def data_fim(e):
+
+    dataConverter = date_picker_fim.value
+    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
+
+    txtDataFim.content.value = data2.strftime("%d/%m/%Y")
+    txtDataFim.update()
+
+
+date_picker_fim = ft.DatePicker(
+    on_change=data_fim,
+    # on_dismiss=date_picker_dismissed,
+    first_date=datetime(2024, 1, 1),
+    # last_date=datetime.datetime(2024, 10, 1),
+)
+
+
+date_button_fim = ft.Container(content=ft.ElevatedButton(
+    "Data Final",
+    icon=ft.icons.CALENDAR_MONTH,
+    on_click=lambda _: date_picker_fim.pick_date(),
+), expand=True)
+
+
+txtDataFim = ft.Container(content=ft.TextField(
+    label='Data Final',
+    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+    bgcolor=ft.colors.BLUE_100,
+    border_color=ft.colors.BLACK12,
+    focused_bgcolor=ft.colors.BLUE_GREY_200,
+    read_only=True
+), expand=True)
+
+
+def mostrarMensagemExpo(msg: str, color: str):
+    alertMesgExp.content.value = str(msg)
+    alertMesgExp.content.color = str(color)
+    alertMesgExp.open = True
+    body.update()
+
+
+alertMesgExp = ft.SnackBar(
+    content=ft.Text("Despacho cadastrado!", color=ft.colors.GREEN, size=25),
+    open=False,
+    bgcolor=ft.colors.WHITE,
+    show_close_icon=True,
+    padding=20,
+    close_icon_color=ft.colors.RED
+)
+
+
+def exportarDespacho(e):
+    dataInicio = txtDataInicio.content.value
+    dataFim = txtDataFim.content.value
+    if (dataInicio == None or (dataInicio.lstrip()) == "" or dataFim == None or (dataFim.lstrip()) == ""):
+        mostrarMensagemExpo(
+            msg="Informe as datas de Início e Fim!", color=ft.colors.RED)
+    else:
+        dataConverter = date_picker_fim.value
+        dataFinal = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
+
+        final = dataFinal.strftime("%Y-%m-%d")
+
+        dataConverter2 = date_picker_inicio.value
+        dataInicial = datetime.strptime(
+            str(dataConverter2), "%Y-%m-%d 00:00:00")
+
+        inicial = dataInicial.strftime("%Y-%m-%d")
+
+        despachoPesqu = Despacho()
+        despachos = despachoPesqu.pesquisaDespachoExportar(inicial, final)
+        despachos = pd.DataFrame(despachos, columns=['nome', 'cpf', 'rg', 'endereco', 'telefone', 'PLACA', 'veiculo', 'marca', 'ano_veiculo',
+                                 'cor', 'chassi', 'combustivel', 'renavam', 'numero_motor', 'valor', 'data_aquisicao', 'data_servico', 'valor_servico', 'observacao'])
+        despachos.to_excel('despachos.xlsx')
+        mostrarMensagemExpo(
+            msg="Despacho exportado!", color=ft.colors.GREEN)
+
+        # pesquisaDespachoExportar
+
+
+btnExportarDespacho = ft.ElevatedButton(
+    text="Exportar", icon=ft.icons.ADD_ROUNDED, style=btnStyle, on_click=exportarDespacho)
+exportacao = ft.Column(controls=[
+    ft.Container(
+        bgcolor=ft.colors.WHITE,
+        content=ft.Column(
+            controls=[
+                ft.Row(
+                    controls=[
+                       date_picker_inicio,
+                       date_button_inicio,
+                       txtDataInicio,
+                       date_picker_fim,
+                       date_button_fim,
+                       txtDataFim
+
+                       ],
+
+
+                ),
+                ft.Row(
+                    controls=[
+                        btnExportarDespacho,
+                    ],
+
+
+                ),
+                alertMesgExp
+            ],
+        ),
+        margin=ft.margin.all(50),
+        padding=10,
+    ),
+
 ])
 
 
@@ -1141,9 +1328,12 @@ def changeBody(e):
     if (e.control.selected_index == 1):
         body.controls[0].controls[0].content = despacho
         vermelho.controls[0].margin = ft.margin.only(top=100)
-    else:
+    elif (e.control.selected_index == 0):
         body.controls[0].controls[0].content = pessoa
         vermelho.controls[0].margin = ft.margin.only(top=40)
+    else:
+        body.controls[0].controls[0].content = exportacao
+        vermelho.controls[0].margin = ft.margin.only(top=160)
 
     vermelho.update()
     body.update()
@@ -1182,9 +1372,13 @@ def main(page: ft.Page):
                 selected_icon_content=ft.Icon(ft.icons.FOLDER_SHARED_ROUNDED),
                 label="Despacho",
             ),
-
+            ft.NavigationRailDestination(
+                icon_content=ft.Icon(ft.icons.DOWNLOAD_FOR_OFFLINE_OUTLINED),
+                selected_icon_content=ft.Icon(
+                    ft.icons.DOWNLOAD_FOR_OFFLINE_ROUNDED),
+                label="Exportar",
+            ),
         ],
-
     )
 
     page.add(

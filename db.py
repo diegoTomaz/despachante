@@ -33,6 +33,7 @@ tabela_despacho = """
                 valor_servico real,
                 observacao text,
                 cliente_id integer,
+                ocorrencia text,
                 FOREIGN KEY (cliente_id) REFERENCES cliente (id))
                 """
 cursor.execute(tabela_despacho)

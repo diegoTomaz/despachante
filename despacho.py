@@ -1,4 +1,5 @@
 from db import cursor, banco
+from datetime import datetime
 
 
 class Despacho:
@@ -20,11 +21,13 @@ class Despacho:
     # self.cliente_id = cliente_id
 
     def gravarDespacho(self):
+        data_atual = datetime.today()
+        data_em_texto = data_atual.strftime("%Y-%m-%d")
         insert_despacho = """
                         INSERT INTO despacho
                         (placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor,
-                         valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id)
-                        VALUES (?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?)
+                         valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id,ocorrencia)
+                        VALUES (?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?)
                         """
         novoDespacho = [self.placa,
                         self.veiculo,
@@ -41,6 +44,7 @@ class Despacho:
                         self.valor_servico,
                         self.observacao,
                         self.cliente_id,
+                        data_em_texto
                         ]
 
         cursor.execute(insert_despacho, novoDespacho)
@@ -50,7 +54,9 @@ class Despacho:
     def atualizarDespacho(self, id) -> None:
         # update_cliente = f'UPDATE clientes set nome = "{self.nome}", cpf="{self.cpf}", rg ="{self.rg}", endereco="{self.endereco}" where id= {id}'
 
-        update_despacho = '''
+        data_atual = datetime.today()
+        data_em_texto = data_atual.strftime("%Y-%m-%d")
+        update_despacho = ''' 
                         UPDATE despacho 
                         set placa = ?, 
                         veiculo=?, 
@@ -66,7 +72,8 @@ class Despacho:
                         data_servico=? ,
                         valor_servico=? ,
                         observacao=? ,
-                        cliente_id=? 
+                        cliente_id=? ,
+                        ocorrencia=? 
                         where id= ?
                         '''
 
@@ -87,7 +94,8 @@ class Despacho:
             self.valor_servico,
             self.observacao,
             self.cliente_id,
-            id
+            id,
+            data_em_texto
         ]
 
         cursor.execute(update_despacho, attDespacho)
@@ -165,6 +173,40 @@ class Despacho:
                 where c.nome like "%{valor}%" OR c.cpf like "%{valor}%" OR d.placa like "%{valor}%"
                 order by d.id   
                     '''
+        cursor.execute(pesquisa_despachos)
+        despachos = cursor.fetchall()
+        return despachos
+
+    def pesquisaDespachoExportar(self, inicial, final):
+        pesquisa_despachos = f'''
+                   SELECT
+                    C.nome,
+                    C.cpf,
+                    C.rg,
+                    C.endereco,
+                    C.telefone,
+                    D.PLACA,
+                    D.veiculo,
+                    D.marca,
+                    D.ano_veiculo,
+                    D.cor,
+                    D.chassi,
+                    D.combustivel,
+                    D.renavam,
+                    D.numero_motor,
+                    D.valor,
+                    D.data_aquisicao,
+                    D.data_servico,
+                    D.valor_servico,
+                    D.observacao
+                FROM
+                    despacho D
+                INNER JOIN
+                clientes C
+                ON D.cliente_id = C.id
+                where D.ocorrencia >= "{inicial}" AND D.ocorrencia <= "{final}"
+                order by D.ocorrencia
+                '''
         cursor.execute(pesquisa_despachos)
         despachos = cursor.fetchall()
         return despachos
