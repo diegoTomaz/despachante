@@ -289,9 +289,15 @@ def atualizarGridPessoas():
                       endereco="oi", telefone="oi")
     clientes = cliente.ultimosCliente()
 
+    primerioClinete = False
+    idPrimeiro = None
+    nomePrimeiro = None
     tabelaPessoas.rows = []
 
     for cl in clientes:
+        if (not primerioClinete):
+            idPrimeiro = cl[0]
+            nomePrimeiro = cl[1]
         tabelaPessoas.rows.append(ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(str(cl[1]))),
@@ -308,6 +314,7 @@ def atualizarGridPessoas():
                     ])),
             ],
         ))
+        primerioClinete = True
 
     # tabelaPessoas.rows.insert(0,ft.DataRow(
     #                 cells=[
@@ -319,6 +326,8 @@ def atualizarGridPessoas():
     #             ))
 
     tabelaPessoas.update()
+    txtIdClienteDespacho.content.value = idPrimeiro
+    txtClienteDespacho.content.value = nomePrimeiro
 
 
 pessoa = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
@@ -399,7 +408,6 @@ def limparFormDespacho():
     searchCliente.value = ""
     searchCliente.controls = []
     txtPlaca.content.value = ""
-    txtVeiculo.content.value = ""
     txtMarca.content.value = ""
     txtAnoVeiculo.content.value = ""
     txtCor.content.value = ""
@@ -469,7 +477,6 @@ def confirma_excluir_despacho(e):
 def gravarDespacho(e):
     clienteId = txtIdClienteDespacho.content.value
     placa = txtPlaca.content.value
-    veiculo = txtVeiculo.content.value
     marca = txtMarca.content.value
     ano_veiculo = txtAnoVeiculo.content.value
     cor = txtCor.content.value
@@ -491,10 +498,8 @@ def gravarDespacho(e):
         mostrarMensagemDespacho(msg="Informe o cliente!", color=ft.colors.RED)
     else:
         if (idDespacho != None and idDespacho != ""):
-            pass
             despachoEdit = Despacho()
             despachoEdit.placa = placa
-            despachoEdit.veiculo = veiculo
             despachoEdit.marca = marca
             despachoEdit.ano_veiculo = ano_veiculo
             despachoEdit.cor = cor
@@ -517,7 +522,6 @@ def gravarDespacho(e):
         else:
             despacho = Despacho()
             despacho.placa = placa
-            despacho.veiculo = veiculo
             despacho.marca = marca
             despacho.ano_veiculo = ano_veiculo
             despacho.cor = cor
@@ -540,23 +544,22 @@ def gravarDespacho(e):
 
 
 def editar_despacho(e):
-    txtIdClienteDespacho.content.value = e.control.data[16]
+    txtIdClienteDespacho.content.value = e.control.data[15]
     txtClienteDespacho.content.value = e.control.data[0]
     txtPlaca.content.value = e.control.data[1]
-    txtVeiculo.content.value = e.control.data[2]
-    txtMarca.content.value = e.control.data[3]
-    txtAnoVeiculo.content.value = e.control.data[4]
-    txtCor.content.value = e.control.data[5]
-    txtChassi.content.value = e.control.data[6]
-    txtCombustivel.content.value = e.control.data[7]
-    txtRenavam.content.value = e.control.data[8]
-    txtNumeroMotor.content.value = e.control.data[9]
-    txtValor.content.value = str(e.control.data[10]).replace(".", ",")
-    txtDataAquisicao.content.value = e.control.data[11]
-    txtDataServico.content.value = e.control.data[12]
-    txtValorServico.content.value = str(e.control.data[13]).replace(".", ",")
-    txtObservacao.content.value = e.control.data[14]
-    txtIdDespacho.content.value = e.control.data[15]
+    txtMarca.content.value = e.control.data[2]
+    txtAnoVeiculo.content.value = e.control.data[3]
+    txtCor.content.value = e.control.data[4]
+    txtChassi.content.value = e.control.data[5]
+    txtCombustivel.content.value = e.control.data[6]
+    txtRenavam.content.value = e.control.data[7]
+    txtNumeroMotor.content.value = e.control.data[8]
+    txtValor.content.value = str(e.control.data[9]).replace(".", ",")
+    txtDataAquisicao.content.value = e.control.data[10]
+    txtDataServico.content.value = e.control.data[11]
+    txtValorServico.content.value = str(e.control.data[12]).replace(".", ",")
+    txtObservacao.content.value = e.control.data[13]
+    txtIdDespacho.content.value = e.control.data[14]
 
     despacho.update()
 
@@ -602,6 +605,12 @@ def pesquisaTap(e):
     searchCliente.close_view()
 
 
+def adiciona_cliente(e):
+    txtIdClienteDespacho.content.value = e.control.data[15]
+    txtClienteDespacho.content.value = e.control.data[0]
+    despacho.update()
+
+
 def atualizarGridDespacho():
     despachos = Despacho.ultimosDespachos()
 
@@ -610,6 +619,15 @@ def atualizarGridDespacho():
     for desp in despachos:
         tabelaDespacho.rows.append(ft.DataRow(
             cells=[
+                ft.DataCell(
+                    ft.Row([
+                        ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                      data=desp, tooltip="Incluir", on_click=adiciona_cliente, icon_size=40, width=60, height=60),
+                        ft.IconButton("edit", icon_color="blue",
+                                      data=desp, tooltip="Editar", on_click=editar_despacho),
+                        ft.IconButton("delete", icon_color="red",
+                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                    ])),
                 ft.DataCell(ft.Text(str(desp[0]))),
                 ft.DataCell(ft.Text(str(desp[1]))),
                 ft.DataCell(ft.Text(str(desp[2]))),
@@ -624,15 +642,8 @@ def atualizarGridDespacho():
                 ft.DataCell(ft.Text(str(desp[11]))),
                 ft.DataCell(ft.Text(str(desp[12]))),
                 ft.DataCell(ft.Text(str(desp[13]))),
-                ft.DataCell(ft.Text(str(desp[14]))),
 
-                ft.DataCell(
-                    ft.Row([
-                        ft.IconButton("edit", icon_color="blue",
-                                      data=desp, tooltip="Editar", on_click=editar_despacho),
-                        ft.IconButton("delete", icon_color="red",
-                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
-                    ])),
+
             ],
         ))
 
@@ -700,16 +711,9 @@ txtPlaca = ft.Container(content=ft.TextField(
 
 ), expand=True)
 
-txtVeiculo = ft.Container(content=ft.TextField(
-    label='Veículo',
-    label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-    bgcolor=ft.colors.BLUE_100,
-    border_color=ft.colors.BLACK12,
-    focused_bgcolor=ft.colors.BLUE_GREY_200,
-), expand=True)
 
 txtMarca = ft.Container(content=ft.TextField(
-    label='Marca',
+    label='Marca/Modelo',
     label_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
@@ -780,7 +784,7 @@ txtDataAquisicao = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
-    read_only=True
+    # read_only=True
 ), expand=True)
 
 txtDataServico = ft.Container(content=ft.TextField(
@@ -789,7 +793,7 @@ txtDataServico = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
-    read_only=True
+    # read_only=True
 ), expand=True)
 
 txtValorServico = ft.Container(content=ft.TextField(
@@ -829,54 +833,6 @@ txtIdExclusaoDespacho = ft.Container(content=ft.TextField(
 ), expand=True)
 
 
-def data_aquisicao_alterada(e):
-
-    dataConverter = date_picker_aquisicao.value
-    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
-
-    txtDataAquisicao.content.value = data2.strftime("%d/%m/%Y")
-    txtDataAquisicao.update()
-
-
-date_picker_aquisicao = ft.DatePicker(
-    on_change=data_aquisicao_alterada,
-    # on_dismiss=date_picker_dismissed,
-    first_date=datetime(2024, 1, 1),
-    # last_date=datetime.datetime(2024, 10, 1),
-)
-
-
-date_button_aquisicao = ft.Container(content=ft.ElevatedButton(
-    "Data da aquisição",
-    icon=ft.icons.CALENDAR_MONTH,
-    on_click=lambda _: date_picker_aquisicao.pick_date(),
-), expand=True)
-
-
-def data_servico_alterada(e):
-
-    dataConverter = date_picker_servico.value
-    data2 = datetime.strptime(str(dataConverter), "%Y-%m-%d 00:00:00")
-
-    txtDataServico.content.value = data2.strftime("%d/%m/%Y")
-    txtDataServico.update()
-
-
-date_picker_servico = ft.DatePicker(
-    on_change=data_servico_alterada,
-    # on_dismiss=date_picker_dismissed,
-    first_date=datetime(2024, 1, 1),
-    # last_date=datetime.datetime(2024, 10, 1),
-)
-
-
-date_button_servico = ft.Container(content=ft.ElevatedButton(
-    "Data do serviço",
-    icon=ft.icons.CALENDAR_MONTH,
-    on_click=lambda _: date_picker_servico.pick_date(),
-), expand=True)
-
-
 tabelaDespacho = ft.DataTable(
     expand_loose=False,
     bgcolor=ft.colors.WHITE,
@@ -887,10 +843,10 @@ tabelaDespacho = ft.DataTable(
     heading_row_color=ft.colors.BLUE_100,
     data_row_color={"hovered": "0x30FF0000"},
     columns=[
+        ft.DataColumn(ft.Text("")),
         ft.DataColumn(ft.Text("Cliente")),
         ft.DataColumn(ft.Text("Placa")),
-        ft.DataColumn(ft.Text("veiculo")),
-        ft.DataColumn(ft.Text("marca")),
+        ft.DataColumn(ft.Text("Marca/Modelo")),
         ft.DataColumn(ft.Text("ano_veiculo")),
         ft.DataColumn(ft.Text("cor")),
         ft.DataColumn(ft.Text("chassi")),
@@ -902,7 +858,7 @@ tabelaDespacho = ft.DataTable(
         ft.DataColumn(ft.Text("data_servico")),
         ft.DataColumn(ft.Text("valor_servico")),
         ft.DataColumn(ft.Text("observacao")),
-        ft.DataColumn(ft.Text("")),
+
     ],
     rows=linhasTabela
 )
@@ -917,6 +873,15 @@ tabelaDespacho.rows = []
 for desp in despachos:
     tabelaDespacho.rows.append(ft.DataRow(
         cells=[
+            ft.DataCell(
+                ft.Row([
+                    ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                  data=desp, tooltip="Incluir", on_click=adiciona_cliente, icon_size=40, width=60, height=60),
+                    ft.IconButton("edit", icon_color="blue",
+                                  data=desp, tooltip="Editar", on_click=editar_despacho),
+                    ft.IconButton("delete", icon_color="red",
+                                  data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                ])),
             ft.DataCell(ft.Text(str(desp[0]))),
             ft.DataCell(ft.Text(str(desp[1]))),
             ft.DataCell(ft.Text(str(desp[2]))),
@@ -931,15 +896,8 @@ for desp in despachos:
             ft.DataCell(ft.Text(str(desp[11]))),
             ft.DataCell(ft.Text(str(desp[12]))),
             ft.DataCell(ft.Text(str(desp[13]))),
-            ft.DataCell(ft.Text(str(desp[14]))),
 
-            ft.DataCell(
-                ft.Row([
-                    ft.IconButton("edit", icon_color="blue",
-                                  data=desp, tooltip="Editar", on_click=editar_despacho),
-                    ft.IconButton("delete", icon_color="red",
-                                  data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
-                ])),
+
         ],
     ))
 
@@ -959,6 +917,15 @@ def pesquisandoDespacho(e):
     for desp in despachos:
         tabelaDespacho.rows.append(ft.DataRow(
             cells=[
+                ft.DataCell(
+                    ft.Row([
+                        ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                      data=desp, tooltip="Incluir", on_click=adiciona_cliente, icon_size=40, width=60, height=60),
+                        ft.IconButton("edit", icon_color="blue",
+                                      data=desp, tooltip="Editar", on_click=editar_despacho),
+                        ft.IconButton("delete", icon_color="red",
+                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                    ])),
                 ft.DataCell(ft.Text(str(desp[0]))),
                 ft.DataCell(ft.Text(str(desp[1]))),
                 ft.DataCell(ft.Text(str(desp[2]))),
@@ -973,14 +940,7 @@ def pesquisandoDespacho(e):
                 ft.DataCell(ft.Text(str(desp[11]))),
                 ft.DataCell(ft.Text(str(desp[12]))),
                 ft.DataCell(ft.Text(str(desp[13]))),
-                ft.DataCell(ft.Text(str(desp[14]))),
-                ft.DataCell(
-                    ft.Row([
-                        ft.IconButton("edit", icon_color="blue",
-                                      data=desp, tooltip="Editar", on_click=editar_despacho),
-                        ft.IconButton("delete", icon_color="red",
-                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
-                    ])),
+
             ],
         ))
     despacho.update()
@@ -1026,7 +986,6 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                 ft.Row(
                     controls=[
                         txtPlaca,
-                        txtVeiculo,
                         txtMarca,
 
                     ],
@@ -1048,9 +1007,7 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                 ),
                 ft.Row(
                     controls=[
-                        date_button_aquisicao,
                         txtDataAquisicao,
-                        date_button_servico,
                         txtDataServico,
                     ],
                 ),
@@ -1069,8 +1026,6 @@ despacho = ft.Column(scroll=ft.ScrollMode.ALWAYS, controls=[
                     controls=[
                         txtIdDespacho,
                         txtIdExclusaoDespacho,
-                        date_picker_servico,
-                        date_picker_aquisicao
                     ],
 
                 ),
@@ -1223,7 +1178,7 @@ def exportarDespacho(e):
 
         despachoPesqu = Despacho()
         despachos = despachoPesqu.pesquisaDespachoExportar(inicial, final)
-        despachos = pd.DataFrame(despachos, columns=['nome', 'cpf', 'rg', 'endereco', 'telefone', 'PLACA', 'veiculo', 'marca', 'ano_veiculo',
+        despachos = pd.DataFrame(despachos, columns=['nome', 'cpf', 'rg', 'endereco', 'telefone', 'Placa', 'Marca/Modleo', 'ano_veiculo',
                                  'cor', 'chassi', 'combustivel', 'renavam', 'numero_motor', 'valor', 'data_aquisicao', 'data_servico', 'valor_servico', 'observacao'])
         despachos.to_excel('despachos.xlsx')
         mostrarMensagemExpo(

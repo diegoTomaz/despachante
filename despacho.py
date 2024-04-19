@@ -25,12 +25,11 @@ class Despacho:
         data_em_texto = data_atual.strftime("%Y-%m-%d")
         insert_despacho = """
                         INSERT INTO despacho
-                        (placa, veiculo, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor,
+                        (placa, marca, ano_veiculo, cor, chassi, combustivel, renavam, numero_motor,
                          valor, data_aquisicao, data_servico, valor_servico, observacao, cliente_id,ocorrencia)
-                        VALUES (?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?)
+                        VALUES ( ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?)
                         """
         novoDespacho = [self.placa,
-                        self.veiculo,
                         self.marca,
                         self.ano_veiculo,
                         self.cor,
@@ -51,17 +50,17 @@ class Despacho:
         banco.commit()
         return True
 
-    def atualizarDespacho(self, id) -> None:
+    def atualizarDespacho(self, id):
         # update_cliente = f'UPDATE clientes set nome = "{self.nome}", cpf="{self.cpf}", rg ="{self.rg}", endereco="{self.endereco}" where id= {id}'
 
         data_atual = datetime.today()
         data_em_texto = data_atual.strftime("%Y-%m-%d")
-        update_despacho = ''' 
-                        UPDATE despacho 
-                        set placa = ?, 
-                        veiculo=?, 
+
+        update_despacho = '''
+                        UPDATE despacho
+                        set placa = ?,
                         marca =?,
-                        ano_veiculo=? , 
+                        ano_veiculo=? ,
                         cor=? ,
                         chassi=? ,
                         combustivel=? ,
@@ -73,14 +72,12 @@ class Despacho:
                         valor_servico=? ,
                         observacao=? ,
                         cliente_id=? ,
-                        ocorrencia=? 
+                        ocorrencia=?
                         where id= ?
                         '''
 
-        # print(update_cliente)
         attDespacho = [
             self.placa,
-            self.veiculo,
             self.marca,
             self.ano_veiculo,
             self.cor,
@@ -94,8 +91,8 @@ class Despacho:
             self.valor_servico,
             self.observacao,
             self.cliente_id,
-            id,
-            data_em_texto
+            data_em_texto,
+            id
         ]
 
         cursor.execute(update_despacho, attDespacho)
@@ -116,7 +113,6 @@ class Despacho:
                    SELECT
                     C.nome,
                     D.PLACA,
-                    D.veiculo,
                     D.marca,
                     D.ano_veiculo,
                     D.cor,
@@ -149,7 +145,6 @@ class Despacho:
                    SELECT
                     C.nome,
                     D.PLACA,
-                    D.veiculo,
                     D.marca,
                     D.ano_veiculo,
                     D.cor,
@@ -186,7 +181,6 @@ class Despacho:
                     C.endereco,
                     C.telefone,
                     D.PLACA,
-                    D.veiculo,
                     D.marca,
                     D.ano_veiculo,
                     D.cor,
