@@ -146,10 +146,14 @@ def excluir_cliente(e):
     if (id != None):
         cliente = Cliente(nome="oi", cpf="oi", rg="oi",
                           endereco="oi", telefone="oi")
-        cliente.excluirCliente(id)
+        retorno = cliente.excluirCliente(id)
         limparFormCliente()
-        mostrarMensagem(msg="Cliente excluído!",
-                        color=ft.colors.GREEN)
+        if (retorno):
+            mostrarMensagem(msg="Cliente excluído!",
+                            color=ft.colors.GREEN)
+        else:
+            mostrarMensagem(msg="Cliente com serviços não podem ser excluídos!",
+                            color=ft.colors.RED)
         atualizarGridPessoas()
         fecharModal(e)
 
@@ -185,6 +189,12 @@ def editar_cliente(e):
     pessoa.update()
 
 
+def adicionaClienteNoDespacho(e):
+    txtIdClienteDespacho.content.value = e.control.data[0]
+    txtClienteDespacho.content.value = e.control.data[1]
+    irParaDespacho()
+
+
 linhasTabela = [
 
 ]
@@ -198,12 +208,13 @@ tabelaPessoas = ft.DataTable(
     heading_row_color=ft.colors.BLUE_100,
     data_row_color={"hovered": "0x30FF0000"},
     columns=[
+        ft.DataColumn(ft.Text("")),
         ft.DataColumn(ft.Text("Nome")),
         ft.DataColumn(ft.Text("Cpf")),
         ft.DataColumn(ft.Text("Rg")),
         ft.DataColumn(ft.Text("Endereço")),
         ft.DataColumn(ft.Text("Telefone")),
-        ft.DataColumn(ft.Text("")),
+
     ],
     rows=linhasTabela
 )
@@ -217,18 +228,21 @@ tabelaPessoas.rows = []
 for cl in clientes:
     tabelaPessoas.rows.append(ft.DataRow(
         cells=[
-            ft.DataCell(ft.Text(str(cl[1]))),
-            ft.DataCell(ft.Text(str(cl[2]))),
-            ft.DataCell(ft.Text(str(cl[3]))),
-            ft.DataCell(ft.Text(str(cl[4]))),
-            ft.DataCell(ft.Text(str(cl[5]))),
             ft.DataCell(
                 ft.Row([
+                    ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                  data=cl, tooltip="Incluir", on_click=adicionaClienteNoDespacho, icon_size=40, width=60, height=60),
                     ft.IconButton("edit", icon_color="blue",
                                   data=cl, tooltip="Editar", on_click=editar_cliente),
                     ft.IconButton("delete", icon_color="red",
                                   data=cl[0], tooltip="Excluir", on_click=confirma_excluir_cliente),
                 ])),
+            ft.DataCell(ft.Text(str(cl[1]))),
+            ft.DataCell(ft.Text(str(cl[2]))),
+            ft.DataCell(ft.Text(str(cl[3]))),
+            ft.DataCell(ft.Text(str(cl[4]))),
+            ft.DataCell(ft.Text(str(cl[5]))),
+
         ],
     ))
 
@@ -250,18 +264,21 @@ def search(e):
     for cl in clientes:
         tabelaPessoas.rows.append(ft.DataRow(
             cells=[
-                ft.DataCell(ft.Text(str(cl[1]))),
-                ft.DataCell(ft.Text(str(cl[2]))),
-                ft.DataCell(ft.Text(str(cl[3]))),
-                ft.DataCell(ft.Text(str(cl[4]))),
-                ft.DataCell(ft.Text(str(cl[5]))),
                 ft.DataCell(
                     ft.Row([
+                        ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                      data=cl, tooltip="Incluir", on_click=adicionaClienteNoDespacho, icon_size=40, width=60, height=60),
                         ft.IconButton("edit", icon_color="blue",
                                       data=cl, tooltip="Editar", on_click=editar_cliente),
                         ft.IconButton("delete", icon_color="red",
                                       data=cl[0], tooltip="Excluir", on_click=confirma_excluir_cliente),
                     ])),
+                ft.DataCell(ft.Text(str(cl[1]))),
+                ft.DataCell(ft.Text(str(cl[2]))),
+                ft.DataCell(ft.Text(str(cl[3]))),
+                ft.DataCell(ft.Text(str(cl[4]))),
+                ft.DataCell(ft.Text(str(cl[5]))),
+
             ],
         ))
     pessoa.update()
@@ -300,18 +317,21 @@ def atualizarGridPessoas():
             nomePrimeiro = cl[1]
         tabelaPessoas.rows.append(ft.DataRow(
             cells=[
-                ft.DataCell(ft.Text(str(cl[1]))),
-                ft.DataCell(ft.Text(str(cl[2]))),
-                ft.DataCell(ft.Text(str(cl[3]))),
-                ft.DataCell(ft.Text(str(cl[4]))),
-                ft.DataCell(ft.Text(str(cl[5]))),
                 ft.DataCell(
                     ft.Row([
+                        ft.IconButton(icon=ft.icons.ADD, icon_color="red",
+                                      data=cl, tooltip="Incluir", on_click=adicionaClienteNoDespacho, icon_size=40, width=60, height=60),
                         ft.IconButton("edit", icon_color="blue",
                                       data=cl, tooltip="Editar", on_click=editar_cliente),
                         ft.IconButton("delete", icon_color="red",
                                       data=cl[0], tooltip="Excluir",  on_click=confirma_excluir_cliente),
                     ])),
+                ft.DataCell(ft.Text(str(cl[1]))),
+                ft.DataCell(ft.Text(str(cl[2]))),
+                ft.DataCell(ft.Text(str(cl[3]))),
+                ft.DataCell(ft.Text(str(cl[4]))),
+                ft.DataCell(ft.Text(str(cl[5]))),
+
             ],
         ))
         primerioClinete = True
@@ -442,7 +462,7 @@ def excluir_despacho(e):
         despachoExc = Despacho()
         despachoExc.excluirDespacho(id)
         limparFormDespacho()
-        mostrarMensagemDespacho(msg="Despacho excluído!",
+        mostrarMensagemDespacho(msg="Serviço excluído!",
                                 color=ft.colors.GREEN)
         atualizarGridDespacho()
         fecharModalDespacho(e)
@@ -516,7 +536,7 @@ def gravarDespacho(e):
 
             despachoEdit.atualizarDespacho(idDespacho)
             limparFormDespacho()
-            mostrarMensagemDespacho(msg="Despacho atualizado!",
+            mostrarMensagemDespacho(msg="Serviço atualizado!",
                                     color=ft.colors.GREEN)
             atualizarGridDespacho()
         else:
@@ -539,7 +559,7 @@ def gravarDespacho(e):
             despacho.gravarDespacho()
             limparFormDespacho()
             mostrarMensagemDespacho(
-                msg="Despacho cadastrado!", color=ft.colors.GREEN)
+                msg="Serviço cadastrado!", color=ft.colors.GREEN)
             atualizarGridDespacho()
 
 
@@ -626,7 +646,7 @@ def atualizarGridDespacho():
                         ft.IconButton("edit", icon_color="blue",
                                       data=desp, tooltip="Editar", on_click=editar_despacho),
                         ft.IconButton("delete", icon_color="red",
-                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                                      data=desp[14], tooltip="Excluir", on_click=confirma_excluir_despacho),
                     ])),
                 ft.DataCell(ft.Text(str(desp[0]))),
                 ft.DataCell(ft.Text(str(desp[1]))),
@@ -672,7 +692,7 @@ btnGravarDespacho = ft.ElevatedButton(
     text="Gravar", icon=ft.icons.ADD_ROUNDED, style=btnStyle, on_click=gravarDespacho)
 
 alertMesgDespacho = ft.SnackBar(
-    content=ft.Text("Despacho cadastrado!", color=ft.colors.GREEN, size=25),
+    content=ft.Text("Serviço cadastrado!", color=ft.colors.GREEN, size=25),
     open=False,
     bgcolor=ft.colors.WHITE,
     show_close_icon=True,
@@ -696,7 +716,7 @@ txtIdClienteDespacho = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
-    visible=False
+    # visible=False
 
 
 ), expand=True)
@@ -880,7 +900,7 @@ for desp in despachos:
                     ft.IconButton("edit", icon_color="blue",
                                   data=desp, tooltip="Editar", on_click=editar_despacho),
                     ft.IconButton("delete", icon_color="red",
-                                  data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                                  data=desp[14], tooltip="Excluir", on_click=confirma_excluir_despacho),
                 ])),
             ft.DataCell(ft.Text(str(desp[0]))),
             ft.DataCell(ft.Text(str(desp[1]))),
@@ -924,7 +944,7 @@ def pesquisandoDespacho(e):
                         ft.IconButton("edit", icon_color="blue",
                                       data=desp, tooltip="Editar", on_click=editar_despacho),
                         ft.IconButton("delete", icon_color="red",
-                                      data=desp[15], tooltip="Excluir", on_click=confirma_excluir_despacho),
+                                      data=desp[14], tooltip="Excluir", on_click=confirma_excluir_despacho),
                     ])),
                 ft.DataCell(ft.Text(str(desp[0]))),
                 ft.DataCell(ft.Text(str(desp[1]))),
@@ -1149,7 +1169,7 @@ def mostrarMensagemExpo(msg: str, color: str):
 
 
 alertMesgExp = ft.SnackBar(
-    content=ft.Text("Despacho cadastrado!", color=ft.colors.GREEN, size=25),
+    content=ft.Text("Serviço cadastrado!", color=ft.colors.GREEN, size=25),
     open=False,
     bgcolor=ft.colors.WHITE,
     show_close_icon=True,
@@ -1180,9 +1200,9 @@ def exportarDespacho(e):
         despachos = despachoPesqu.pesquisaDespachoExportar(inicial, final)
         despachos = pd.DataFrame(despachos, columns=['nome', 'cpf', 'rg', 'endereco', 'telefone', 'Placa', 'Marca/Modleo', 'ano_veiculo',
                                  'cor', 'chassi', 'combustivel', 'renavam', 'numero_motor', 'valor', 'data_aquisicao', 'data_servico', 'valor_servico', 'observacao'])
-        despachos.to_excel('despachos.xlsx')
+        despachos.to_excel('servicos.xlsx')
         mostrarMensagemExpo(
-            msg="Despacho exportado!", color=ft.colors.GREEN)
+            msg="Serviço exportado!", color=ft.colors.GREEN)
 
         # pesquisaDespachoExportar
 
@@ -1325,7 +1345,7 @@ def main(page: ft.Page):
             ft.NavigationRailDestination(
                 icon_content=ft.Icon(ft.icons.FOLDER_SHARED_OUTLINED),
                 selected_icon_content=ft.Icon(ft.icons.FOLDER_SHARED_ROUNDED),
-                label="Despacho",
+                label="Serviço",
             ),
             ft.NavigationRailDestination(
                 icon_content=ft.Icon(ft.icons.DOWNLOAD_FOR_OFFLINE_OUTLINED),

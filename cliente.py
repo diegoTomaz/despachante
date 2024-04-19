@@ -35,14 +35,20 @@ class Cliente:
         banco.commit()
 
     def excluirCliente(self, id) -> None:
-
-        delete_cliente = 'DELETE from clientes where id= ?'
-
-        # print(update_cliente)
         excCliente = [id]
 
-        cursor.execute(delete_cliente, excCliente)
-        banco.commit()
+        verifica_cliente_despacho = 'SELECT count(*) from despacho where cliente_id = ?'
+
+        cursor.execute(verifica_cliente_despacho, excCliente)
+        despachos = cursor.fetchone()
+
+        if (despachos[0] > 0):
+            return False
+        else:
+            delete_cliente = 'DELETE from clientes where id= ?'
+            cursor.execute(delete_cliente, excCliente)
+            banco.commit()
+            return True
 
     def ultimosCliente(self):
         pesquisa_clientes = 'SELECT id,nome,cpf,rg,endereco,telefone from clientes ORDER BY ID DESC LIMIT 20'
