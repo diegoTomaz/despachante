@@ -716,7 +716,7 @@ txtIdClienteDespacho = ft.Container(content=ft.TextField(
     bgcolor=ft.colors.BLUE_100,
     border_color=ft.colors.BLACK12,
     focused_bgcolor=ft.colors.BLUE_GREY_200,
-    # visible=False
+    visible=False
 
 
 ), expand=True)
